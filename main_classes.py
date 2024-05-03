@@ -104,17 +104,17 @@ class Employee(Person):
 
 
 class Client(Person):
-    def __init__(self, name, client_ID, client_address, contact_details, budget):
+    def __init__(self, name, client_id, address, contact_details, budget):
         super().__init__(name)
-        self._client_ID = client_ID
-        self._address = client_address
+        self._client_id = client_id
+        self._address = address
         self._contact_details = contact_details
         self._budget = budget
 
     def display(self):
         print("---" * 10, "Client", "---" * 10)
         super().display()
-        print(f"Client ID: {self._client_ID}")
+        print(f"Client ID: {self._client_id}")
         print(f"Address: {self._address}")
         print(f"Contact Details: {self._contact_details}")
         print(f"Budget: {self._budget}")
@@ -134,20 +134,17 @@ class Client(Person):
         pass  # This is implemented in the GUI
 
 class Guest(Person):
-    def __init__(self, name, guest_ID, address, contact_details, guest_event):
+    def __init__(self, name, guest_id, contact_details):
         super().__init__(name)
-        self._guest_ID = guest_ID
-        self._address = address
+        self._guest_ID = guest_id
         self._contact_details = contact_details
-        self._guest_event = guest_event
 
     def display(self):
         print("---" * 10, "Guest", "---" * 10)
         super().display()
         print(f"Guest ID: {self._guest_ID}")
-        print(f"Address: {self._address}")
         print(f"Contact Details: {self._contact_details}")
-        print(f"Guest Event: {self._guest_event}")
+
 
     # Methods to be used in the system
     def add_guests(self):
@@ -163,22 +160,22 @@ class Guest(Person):
         pass  # This is implemented in the GUI
 
 class Venue:
-    def __init__(self, venue_ID, name, address, contact, min_guests, max_guests):
-        self._venue_ID = venue_ID
+    def __init__(self, venue_id, name, address, contact_details, min_guests, max_guests):
+        self._venue_id = venue_id
         self._name = name
         self._address = address
-        self._contact = contact
+        self._contact_details = contact_details
         self._min_guests = min_guests
         self._max_guests = max_guests
 
     def display(self):
         print("---" * 10, "Venue", "---" * 10)
-        print(f"Venue ID: {self._venue_ID}")
-        print(f"Name: {self._name}")
-        print(f"Address: {self._address}")
-        print(f"Contact: {self._contact}")
-        print(f"Minimum Guests: {self._min_guests}")
-        print(f"Maximum Guests: {self._max_guests}")
+        print("Venue ID:", self._venue_id)
+        print("Name:", self._name)
+        print("Address:", self._address)
+        print("Contact Details:", self._contact_details)
+        print("Minimum Guests:", self._min_guests)
+        print("Maximum Guests:", self._max_guests)
 
 
     # Methods to be used in the system
@@ -195,20 +192,20 @@ class Venue:
         pass  # This is implemented in the GUI
 
 class Supplier:
-    def __init__(self, supplier_ID, supplier_name, address, contact_details, supplier_type):
-        self._supplier_ID = supplier_ID
-        self._supplier_name = supplier_name
-        self._address = address
+    def __init__(self, supplier_id, name, contact_details, service_type):
+        self._supplier_id = supplier_id
+        self._name = name
         self._contact_details = contact_details
-        self._supplier_type = supplier_type
+        self._service_type = service_type
+
+
 
     def display(self):
         print("---" * 10, "Supplier", "---" * 10)
-        print(f"Supplier ID: {self._supplier_ID}")
-        print(f"Supplier Name: {self._supplier_name}")
-        print(f"Address: {self._address}")
-        print(f"Contact Details: {self._contact_details}")
-        print(f"Supplier Type: {self._supplier_type}")
+        print("Supplier ID:", self._supplier_id)
+        print("Name:", self._name)
+        print("Contact Details:", self._contact_details)
+        print("Service Type:", self._service_type)
 
     # Methods to be used in the system
     def add_supplier(self):
@@ -224,47 +221,34 @@ class Supplier:
         pass  # This is implemented in the GUI
 
 class Event:
-    def __init__(self, event_title, event_ID, event_type, event_theme, event_date, event_time, event_duration,
-                 event_venue, event_catering=None, event_cleaning=None, event_decorations=None,
-                 event_entertainment=None, event_furniture=None, invoice=None, client=None):
+    def __init__(self, event_id, type: EventType, theme, date, time, duration, venue, client_id, suppliers,
+                 guest_list, invoice):
 
-        self._event_title = event_title
-        self._event_ID = event_ID
-        self._event_type = event_type
-        self._event_theme = event_theme
-        self._event_date = event_date
-        self._event_time = event_time
-        self._event_duration = event_duration
-        self._event_venue = event_venue
-        self._event_catering = event_catering
-        self._event_cleaning = event_cleaning
-        self._event_decorations = event_decorations
-        self._event_entertainment = event_entertainment
-        self._event_furniture = event_furniture
+        self._event_id = event_id
+        self._type = type
+        self._theme = theme
+        self._date = date
+        self._time = time
+        self._duration = duration
+        self._venue = venue
+        self._client_id = client_id
+        self._suppliers = suppliers
+        self._guest_list = guest_list
         self._invoice = invoice
-        self._client = client
-        self._guest_list = []
-        self._suppliers = []
 
     def display(self):
         print("---" * 10, "Event", "---" * 10)
-        print(f"Event Title: {self._event_title}")
-        print(f"Event ID: {self._event_ID}")
-        print(f"Event Type: {self._event_type}")
-        print(f"Event Theme: {self._event_theme}")
-        print(f"Event Date: {self._event_date}")
-        print(f"Event Time: {self._event_time}")
-        print(f"Event Duration: {self._event_duration}")
-        print(f"Event Venue: {self._event_venue}")
-        print(f"Event Catering: {self._event_catering}")
-        print(f"Event Cleaning: {self._event_cleaning}")
-        print(f"Event Decorations: {self._event_decorations}")
-        print(f"Event Entertainment: {self._event_entertainment}")
-        print(f"Event Furniture: {self._event_furniture}")
-        print(f"Invoice: {self._invoice}")
-        print(f"Client: {self._client}")
-        print(f"Guest List: {self._guest_list}")
-        print(f"Suppliers: {self._suppliers}")
+        print("Event ID:", self._event_id)
+        print("Type:", self._type)
+        print("Theme:", self._theme)
+        print("Date:", self._date)
+        print("Time:", self._time)
+        print("Duration:", self._duration)
+        print("Venue:", self._venue)
+        print("Client ID:", self._client_id)
+        print("Suppliers:", self._suppliers)
+        print("Guest List:", self._guest_list)
+        print("Invoice:", self._invoice)
 
 
     # Methods to be used in the system

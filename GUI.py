@@ -147,7 +147,8 @@ class CompanySystemGUI:
                 emp_data["Manager ID"],  # Manager ID
             ])
 
-    # Function that adds a new employee to the database (activated once the user presses add employee)
+    # Function that adds a new employee to the database (activated once the user presses add employee) The format below
+    # will be applied to other sections as well due to time constraints
     def add_employee(self):
         add_window = tk.Toplevel(self.master)
         add_window.title("Add New Employee")
@@ -333,6 +334,173 @@ class CompanySystemGUI:
                 messagebox.showerror("Error", f"No employee found with ID: {emp_id}")
         else:
             messagebox.showerror("Error", "Invalid Employee ID")
+
+    def display_client_management(self):
+        for widget in self.management_frame.winfo_children():
+            widget.destroy()
+
+        self.client_tree = ttk.Treeview(self.management_frame,
+                                        columns=("Client ID", "Type", "Date", "Time", "Duration", "Venue"),
+                                        show="headings")
+        self.client_tree.heading("Client ID", text="Client ID")
+        self.client_tree.heading("Type", text="Type")
+        self.client_tree.heading("Date", text="Date")
+        self.client_tree.heading("Time", text="Time")
+        self.client_tree.heading("Duration", text="Duration")
+        self.client_tree.heading("Venue", text="Venue")
+        self.client_tree.pack(padx=10, pady=10, fill='both', expand=True)
+
+        tk.Button(self.management_frame, text="Add Client", command=self.add_client).pack(side=tk.LEFT, padx=10,
+                                                                                          pady=10)
+        tk.Button(self.management_frame, text="Delete Client", command=self.delete_client).pack(side=tk.LEFT, padx=10,
+                                                                                                pady=10)
+        tk.Button(self.management_frame, text="Modify Client", command=self.modify_client).pack(side=tk.LEFT, padx=10,
+                                                                                                pady=10)
+        tk.Button(self.management_frame, text="Display Client Details", command=self.display_client_details).pack(
+            side=tk.LEFT, padx=10, pady=10)
+
+        tk.Button(self.management_frame, text="Back to Menu", command=self.display_main_menu).pack(side=tk.LEFT,
+                                                                                                   padx=10, pady=10)
+
+        self.update_client_tree()
+
+    def update_client_tree(self):
+        self.client_tree.delete(*self.client_tree.get_children())
+        for client_id, details in self.clients_events.items():
+            self.client_tree.insert("", "end", values=(
+                client_id, details['type'], details['date'], details['time'], details['duration'], details['venue']))
+
+    def add_client(self):
+        add_window = tk.Toplevel(self.master)
+        add_window.title("Add New Client")
+
+        client_id = max(self.clients_events.keys(), default=0) + 1
+
+        tk.Label(add_window, text="Assigned Client ID:").grid(row=0, column=0)
+        tk.Label(add_window, text=str(client_id)).grid(row=0, column=1)
+
+        tk.Label(add_window, text="Type:").grid(row=1, column=0)
+        type_var = tk.StringVar()
+        type_dropdown = ttk.Combobox(add_window, textvariable=type_var, state="readonly",
+                                     values=["Wedding", "Birthday", "Themed Parties", "Graduation"])
+        type_dropdown.grid(row=1, column=1)
+
+        tk.Label(add_window, text="Date (yyyy-mm-dd):").grid(row=2, column=0)
+        date_entry = tk.Entry(add_window)
+        date_entry.grid(row=2, column=1)
+
+        tk.Label(add_window, text="Time (hh:mm):").grid(row=3, column=0)
+        time_entry = tk.Entry(add_window)
+        time_entry.grid(row=3, column=1)
+
+        tk.Label(add_window, text="Duration:").grid(row=4, column=0)
+        duration_entry = tk.Entry(add_window)
+        duration_entry.grid(row=4, column=1)
+
+        tk.Label(add_window, text="Venue:").grid(row=5, column=0)
+        venue_var = tk.StringVar()
+        venue_dropdown = ttk.Combobox(add_window, textvariable=venue_var, state="readonly",
+                                      values=["The Glasshouse", "Midtown", "Rose Gardens"])
+        venue_dropdown.grid(row=5, column=1)
+
+        tk.Button(add_window, text="Save Client",
+                  command=lambda: self.save_new_client(add_window, client_id, type_var.get(), date_entry.get(),
+                                                       time_entry.get(), duration_entry.get(), venue_var.get())).grid(
+            row=6, columnspan=2)
+
+    def save_new_client(self, add_window, client_id, type, date, time, duration, venue):
+        if type and date and time and duration and venue:
+            self.clients_events[client_id] = {'type': type, 'date': date, 'time': time, 'duration': duration,
+                                              'venue': venue}
+            save_data(self.clients_events, "clients_events.pkl")
+            self.update_client_tree()
+            add_window.destroy()
+            messagebox.showinfo("Success", "Client added successfully")
+        else:
+            messagebox.showerror("Error", "All fields are required!")
+
+    def delete_client(self):
+        selected_item = self.client_tree.selection()
+        if selected_item:
+            client_id = int(self.client_tree.item(selected_item, 'values')[0])
+            if messagebox.askyesno("Confirm", "Do you want to delete this client?"):
+                del self.clients_events[client_id]
+                save_data(self.clients_events, "clients_events.pkl")
+                self.update_client_tree()
+                messagebox.showinfo("Success", "Client deleted successfully")
+        else:
+            messagebox.showerror("Error", "No client selected")
+
+    def modify_client(self):
+        selected_item = self.client_tree.selection()
+        if selected_item:
+            client_id = int(self.client_tree.item(selected_item, 'values')[0])
+            client_details = self.clients_events.get(client_id)
+            if client_details:
+                modify_window = tk.Toplevel(self.master)
+                modify_window.title("Modify Client Details")
+
+                tk.Label(modify_window, text="Type:").grid(row=0, column=0)
+                type_var = tk.StringVar(value=client_details['type'])
+                type_dropdown = ttk.Combobox(modify_window, textvariable=type_var, state="readonly",
+                                             values=["Wedding", "Birthday", "Themed Parties", "Graduation"])
+                type_dropdown.grid(row=0, column=1)
+
+                tk.Label(modify_window, text="Date (yyyy-mm-dd):").grid(row=1, column=0)
+                date_entry = tk.Entry(modify_window)
+                date_entry.insert(0, client_details['date'])
+                date_entry.grid(row=1, column=1)
+
+                tk.Label(modify_window, text="Time (hh:mm):").grid(row=2, column=0)
+                time_entry = tk.Entry(modify_window)
+                time_entry.insert(0, client_details['time'])
+                time_entry.grid(row=2, column=1)
+
+                tk.Label(modify_window, text="Duration:").grid(row=3, column=0)
+                duration_entry = tk.Entry(modify_window)
+                duration_entry.insert(0, client_details['duration'])
+                duration_entry.grid(row=3, column=1)
+
+                tk.Label(modify_window, text="Venue:").grid(row=4, column=0)
+                venue_var = tk.StringVar(value=client_details['venue'])
+                venue_dropdown = ttk.Combobox(modify_window, textvariable=venue_var, state="readonly",
+                                              values=["The Glasshouse", "Midtown", "Rose Gardens"])
+                venue_dropdown.grid(row=4, column=1)
+
+                tk.Button(modify_window, text="Save Changes",
+                          command=lambda: self.apply_client_changes(modify_window, client_id, type_var.get(),
+                                                                    date_entry.get(), time_entry.get(),
+                                                                    duration_entry.get(), venue_var.get())).grid(row=5,
+                                                                                                                 columnspan=2)
+            else:
+                messagebox.showerror("Error", "Client not found")
+        else:
+            messagebox.showerror("Error", "No client selected")
+
+    def apply_client_changes(self, modify_window, client_id, type, date, time, duration, venue):
+        if type and date and time and duration and venue:
+            self.clients_events[client_id] = {'type': type, 'date': date, 'time': time, 'duration': duration,
+                                              'venue': venue}
+            save_data(self.clients_events, "clients_events.pkl")
+            self.update_client_tree()
+            modify_window.destroy()
+            messagebox.showinfo("Success", "Client details updated successfully")
+        else:
+            messagebox.showerror("Error", "All fields are required!")
+
+    def display_client_details(self):
+        client_id = simpledialog.askinteger("Display Client", "Enter Client ID:")
+        if client_id is not None:
+            client_details = self.clients_events.get(client_id)
+            if client_details:
+                details = f"Type: {client_details['type']}\nDate: {client_details['date']}\nTime: {client_details['time']}\nDuration: {client_details['duration']} hours\nVenue: {client_details['venue']}"
+                messagebox.showinfo("Client Details", f"Client ID: {client_id}\nDetails:\n{details}")
+            else:
+                messagebox.showerror("Error", f"No details found for client with ID: {client_id}")
+        else:
+            messagebox.showerror("Error", "Invalid Client ID")
+
+
 
 
 
