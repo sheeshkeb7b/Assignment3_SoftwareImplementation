@@ -25,7 +25,6 @@ class EventType(Enum):
     THEMED_PARTIES = "Themed Parties"
     GRADUATIONS = "Graduations"
 
-
 class SupplierType(Enum):
     CATERING = "Catering"
     CLEANING =  "Cleaning"
@@ -34,21 +33,15 @@ class SupplierType(Enum):
     ENTERTAINMENT = "Entertainment"
 
 class Person:
-    def __init__(self, name, DOB, passport, age):
+    def __init__(self, name):
         self._name = name
-        self._DOB = DOB
-        self._passport = passport
-        self._age = age
 
     def display(self):
         print(f"Name: {self._name}")
-        print(f"Date of Birth: {self._DOB}")
-        print(f"Passport: {self._passport}")
-        print(f"Age: {self._age}")
 
 class Employee(Person):
-    def __init__(self, name, DOB, passport, age, employee_ID, basic_salary, department, job_title, manager_ID=None):
-        super().__init__(name, DOB, passport, age)
+    def __init__(self, employee_ID, name, department, job_title, basic_salary, manager_ID=None):
+        super().__init__(name)
         self._employee_ID = employee_ID
         self._basic_salary = basic_salary
         self._department = department
@@ -57,8 +50,27 @@ class Employee(Person):
         self._employee_list = []
 
         # Assigns a manager ID if the employee job title is not manager (managers would not have the attribute as None)
-        if self._job_title in (EmployeeType.SALES_MANAGERS, EmployeeType.MARKETING_MANAGERS):
+        if self._job_title not in (EmployeeType.SALES_MANAGERS, EmployeeType.MARKETING_MANAGERS):
             self._manager_ID = None
+
+    def get_id(self):
+        return self._employee_ID
+
+    def get_name(self):
+        return self._name
+
+    def get_department(self):
+        return self._department
+
+    def get_job_title(self):
+        return self._job_title
+
+    def get_salary(self):
+        return self._basic_salary
+
+    def get_manager_id(self):
+        return self._manager_ID
+
 
     def display(self):
         print("---" * 10, "Employee", "---" * 10)
@@ -92,8 +104,8 @@ class Employee(Person):
 
 
 class Client(Person):
-    def __init__(self, name, DOB, passport, age, client_ID, client_address, contact_details, budget):
-        super().__init__(name, DOB, passport, age)
+    def __init__(self, name, client_ID, client_address, contact_details, budget):
+        super().__init__(name)
         self._client_ID = client_ID
         self._address = client_address
         self._contact_details = contact_details
@@ -122,8 +134,8 @@ class Client(Person):
         pass  # This is implemented in the GUI
 
 class Guest(Person):
-    def __init__(self, name, DOB, passport, age, guest_ID, address, contact_details, guest_event):
-        super().__init__(name, DOB, passport, age)
+    def __init__(self, name, guest_ID, address, contact_details, guest_event):
+        super().__init__(name)
         self._guest_ID = guest_ID
         self._address = address
         self._contact_details = contact_details
